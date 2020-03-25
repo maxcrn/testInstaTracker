@@ -1,7 +1,11 @@
+import os
 from datetime import datetime
 from itertools import dropwhile, takewhile
 
 import instaloader
+
+os.environ[
+    "GOOGLE_APPLICATION_CREDENTIALS"] = "/Users/maxcarin/Documents/Cours/M1 S2/Gestion de Projet/InstaTracker-d209c2a2aab7.json"
 
 # Données en longitude et latitude de La Rochelle
 lngLRMin = -1.234431
@@ -31,22 +35,21 @@ FIN = datetime(2020, 2, 25)
 DEBUT = datetime(2020, 2, 21)
 
 for post in posts:
-    if FIN >= post.date >= DEBUT: # Condition sur la date du post
+    if FIN >= post.date >= DEBUT:  # Condition sur la date du post
         print(post.date)
         # Condition sur la localisation du post
         if post.location != None and lngLRMin < post.location.lng < lngLRMax and latLRMin < post.location.lat < latLRMax:
             print(post.location)
-            L.download_post(post, '#larochelletourisme')
+            #L.download_post(post, '#larochelletourisme')
             # Condition sur le nom de la localisation (si pas assez précis, envoi à Google Vision)
             if post.location.name == "La Rochelle, France":
-                detect_landmarks_uri(post.url) # Analyse par Google Vision
+                detect_landmarks_uri(post.url)  # Analyse par Google Vision de la photo via son url
         else:
-            detect_landmarks_uri(post.url) # Analyse par Google Vision
+            detect_landmarks_uri(post.url)  # Analyse par Google Vision via son url
 
 
+    # Fonction pour la detection des landmarks via Google Vision
     def detect_landmarks_uri(uri):
-        """Detects landmarks in the file located in Google Cloud Storage or on the
-        Web."""
         from google.cloud import vision
         client = vision.ImageAnnotatorClient()
         image = vision.types.Image()
@@ -57,7 +60,9 @@ for post in posts:
         print('Landmarks:')
 
         for landmark in landmarks:
-            print(landmark.description)
+            print(landmark.description) # Affichage du nom du hotspot
+            print(landmark.locations[0].lat_lng.latitude) # Affichage de la longitude du hotspot
+            print(landmark.locations[0].lat_lng.longitude) # Affichage de la latitude du hotspot
 
         if response.error.message:
             raise Exception(
