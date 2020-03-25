@@ -39,9 +39,9 @@ for post in posts:
             L.download_post(post, '#larochelletourisme')
             # Condition sur le nom de la localisation (si pas assez précis, envoi à Google Vision)
             if post.location.name == "La Rochelle, France":
-                print("Passage dans Google Vision")
+                detect_landmarks_uri(post.url) # Analyse par Google Vision
         else:
-            detect_landmarks_uri(post.url)
+            detect_landmarks_uri(post.url) # Analyse par Google Vision
 
 
     def detect_landmarks_uri(uri):
