@@ -1,11 +1,12 @@
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from itertools import dropwhile, takewhile
 
 import instaloader
 
 # Credentials pour le login sur Google Vision
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/Users/maxcarin/Documents/Cours/M1 S2/Gestion de Projet/InstaTracker-d209c2a2aab7.json"
+os.environ[
+    "GOOGLE_APPLICATION_CREDENTIALS"] = "/Users/maxcarin/Documents/Cours/M1 S2/Gestion de Projet/InstaTracker-d209c2a2aab7.json"
 
 # Données en longitude et latitude de La Rochelle
 lngLRMin = -1.234431
@@ -34,20 +35,78 @@ posts = L.get_hashtag_posts('larochelletourisme')
 FIN = datetime(2020, 3, 24)
 DEBUT = datetime(2020, 3, 21)
 
+resInstaLoader = False
+resGVision = False
+i = 1
+
+
 for post in posts:
     # Condition sur la date du post
     if FIN >= post.date >= DEBUT:
-        print(post.date)
+        j = 1
+
+        print("Photo " + str(i) + " ayant la date " + str(post.date))
 
         # Condition sur la localisation du post
         if post.location != None and lngLRMin < post.location.lng < lngLRMax and latLRMin < post.location.lat < latLRMax:
-            print(post.location)
+            print("Analyse InstaLoader : " + post.location.name)
 
             # Condition sur le nom de la localisation (si pas assez précis, envoi à Google Vision)
             if post.location.name == "La Rochelle, France":
-                detect_landmarks_uri(post.url)  # Analyse par Google Vision de la photo via son url
+                resGVision = detect_landmarks_uri(post.url)  # Analyse par Google Vision de la photo via son url
+            else:
+                resInstaLoader = True
+
         else:
-            detect_landmarks_uri(post.url)  # Analyse par Google Vision via son url
+            print("Pas de localisation InstaLoader")
+            resGVision = detect_landmarks_uri(post.url)  # Analyse par Google Vision via son url
+
+        # S'il y a une localisation précise sur la photo, on selectionne l'utilisateur et on analyse ses posts sur 2 jours
+        if resGVision or resInstaLoader:
+
+            print("")
+            print("Analyse de la trace de l'utilisateur : " + post.owner_username)
+
+            # Récupération du username et des posts correspondant
+            utilActuel = post.owner_username
+            postsUtilActuel = instaloader.Profile.from_username(L.context, utilActuel).get_posts()
+            for postUtilActuel in postsUtilActuel:
+
+
+
+                # Si la date d'un post est à J-2 ou J+2 de la date du post de base
+                # et que le post n'est pas le même que celui de base, on l'analyse
+
+                if post.date + timedelta(days=2) >= postUtilActuel.date >= post.date - timedelta(days=2):
+
+                    print("Photo " + str(j) + " de l'analyse de la trace ayant la date " + str(postUtilActuel.date))
+
+                    # Condition sur la localisation du post
+                    if postUtilActuel.location != None \
+                            and lngLRMin < postUtilActuel.location.lng < lngLRMax \
+                            and latLRMin < postUtilActuel.location.lat < latLRMax:
+                        print("Analyse InstaLoader : " + postUtilActuel.location.name)
+
+                        # Condition sur le nom de la localisation (si pas assez précis, envoi à Google Vision)
+                        if postUtilActuel.location.name == "La Rochelle, France":
+                            # Analyse par Google Vision de la photo via son url
+                            detect_landmarks_uri(postUtilActuel.url)
+
+
+                    # S'il n'y avait pas de localisation de base, analyse par Google Vision
+                    else:
+                        print("Pas de localisation InstaLoader")
+                        detect_landmarks_uri(postUtilActuel.url)
+
+                    j = j + 1
+
+            # On remet les varaibles de test à False
+            resInstaLoader = False
+            resGVision = False
+            print("Fin de l'analyse de la trace utilisateur avec " + str(j) + " photos analysées")
+
+        print("")
+        i = i + 1
 
 
     # Fonction pour la detection des landmarks via Google Vision
@@ -59,10 +118,10 @@ for post in posts:
 
         response = client.landmark_detection(image=image)
         landmarks = response.landmark_annotations
-        if not(landmarks):
-            print('Pas de landmark')
+        if not (landmarks):
+            print('Pas de landmark Google Vision')
         else:
-            print("Landmark(s) :")
+            print("Landmark(s) Google Vision :")
 
         for landmark in landmarks:
 
@@ -70,10 +129,15 @@ for post in posts:
             if lngLRMin < landmark.locations[0].lat_lng.longitude < lngLRMax \
                     and latLRMin < landmark.locations[0].lat_lng.latitude < latLRMax:
                 print(landmark.description)  # Affichage du nom du hotspot
-                print(landmark.locations[0].lat_lng.latitude) # Affichage de la longitude du hotspot
-                print(landmark.locations[0].lat_lng.longitude) # Affichage de la latitude du hotspot
+                print(landmark.locations[0].lat_lng.latitude)  # Affichage de la longitude du hotspot
+                print(landmark.locations[0].lat_lng.longitude)  # Affichage de la latitude du hotspot
+                print("Fin de l'analyse Google Vision")
+                return True
             else:
                 print("Localisation hors La Rochelle")
+                print("Fin de l'analyse Google Vision")
+                return False
+
 
         if response.error.message:
             raise Exception(
