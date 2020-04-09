@@ -26,19 +26,27 @@ L.login("instatrackeruppa", "instatracker")
 ## Pour télécharger des photos entre deux dates sur un hashtag ou un profil ##
 
 # Spécification du hastag sur lequel télécharger les photos
+#posts = L.get_hashtag_posts('larochelletourisme')
 posts = L.get_hashtag_posts('larochelletourisme')
 
 # Spécification du profil sur lequel télécharger les photos
 # posts = instaloader.Profile.from_username(L.context, PROFILE).get_posts()
 
 # Pour télécharger des photos entre deux dates sur un hashtag
-FIN = datetime(2020, 3, 24)
-DEBUT = datetime(2020, 3, 21)
+# Corpus Francofolies
+FIN = datetime(2019, 7, 13)
+DEBUT = datetime(2019, 7, 10)
 
 resInstaLoader = False
 resGVision = False
 i = 1
 
+# Compteur de hotspots
+compteurHSIL = {}
+compteurHSGV = {}
+
+# Booléen pour l'analyse de la trace
+traceEnCours = False
 
 for post in posts:
     # Condition sur la date du post
@@ -63,6 +71,19 @@ for post in posts:
 
         # S'il y a une localisation précise sur la photo, on selectionne l'utilisateur et on analyse ses posts sur 2 jours
         if resGVision or resInstaLoader:
+            # Compteur de hotspots
+            if resInstaLoader:
+                if (post.location.name in compteurHSIL):
+                    compteurHSIL[post.location.name] += 1
+                else:
+                    compteurHSIL[post.location.name] = 1
+            print(compteurHSGV)
+            print(compteurHSIL)
+
+
+
+# METTRE LES USERS DANS UN TABLEAU POUR NE PAS REFAIRE DEUX FOIS LE MEME
+
 
             print("")
             print("Analyse de la trace de l'utilisateur : " + post.owner_username)
@@ -70,12 +91,10 @@ for post in posts:
             # Récupération du username et des posts correspondant
             utilActuel = post.owner_username
             postsUtilActuel = instaloader.Profile.from_username(L.context, utilActuel).get_posts()
+            traceEnCours = True
             for postUtilActuel in postsUtilActuel:
 
-
-
                 # Si la date d'un post est à J-2 ou J+2 de la date du post de base
-                # et que le post n'est pas le même que celui de base, on l'analyse
 
                 if post.date + timedelta(days=2) >= postUtilActuel.date >= post.date - timedelta(days=2):
 
@@ -103,6 +122,7 @@ for post in posts:
             # On remet les varaibles de test à False
             resInstaLoader = False
             resGVision = False
+            traceEnCours = False
             print("Fin de l'analyse de la trace utilisateur avec " + str(j) + " photos analysées")
 
         print("")
@@ -132,6 +152,11 @@ for post in posts:
                 print(landmark.locations[0].lat_lng.latitude)  # Affichage de la longitude du hotspot
                 print(landmark.locations[0].lat_lng.longitude)  # Affichage de la latitude du hotspot
                 print("Fin de l'analyse Google Vision")
+                if not traceEnCours:
+                    if(landmark.description in compteurHSGV):
+                        compteurHSGV[landmark.description] += 1
+                    else:
+                        compteurHSGV[landmark.description] = 1
                 return True
             else:
                 print("Localisation hors La Rochelle")
@@ -144,3 +169,4 @@ for post in posts:
                 '{}\nFor more info on error messages, check: '
                 'https://cloud.google.com/apis/design/errors'.format(
                     response.error.message))
+
