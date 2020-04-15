@@ -26,16 +26,17 @@ L.login("instatrackeruppa", "instatracker")
 ## Pour télécharger des photos entre deux dates sur un hashtag ou un profil ##
 
 # Spécification du hastag sur lequel télécharger les photos
-posts = L.get_hashtag_posts('larochelletourisme')
+#posts = L.get_hashtag_posts('larochelletourisme')
 #posts = L.get_hashtag_posts('toursaintnicolas')
+posts = L.get_hashtag_posts('larochelletourisme')
 
 # Spécification du profil sur lequel télécharger les photos
 # posts = instaloader.Profile.from_username(L.context, PROFILE).get_posts()
 
 # Pour télécharger des photos entre deux dates sur un hashtag
 # Corpus Francofolies
-FIN = datetime(2019, 7, 13)
-DEBUT = datetime(2019, 7, 10)
+FIN = datetime(2019, 12, 25)
+DEBUT = datetime(2019, 12, 22)
 
 resInstaLoader = False
 resGVision = False
@@ -144,13 +145,14 @@ for post in posts:
                             and lngLRMin < postUtilActuel.location.lng < lngLRMax \
                             and latLRMin < postUtilActuel.location.lat < latLRMax:
                         print("Analyse InstaLoader : " + postUtilActuel.location.name)
-                        traceTemp.append(postUtilActuel.location.name)
+
 
                         # Condition sur le nom de la localisation (si pas assez précis, envoi à Google Vision)
                         if postUtilActuel.location.name == "La Rochelle, France":
                             # Analyse par Google Vision de la photo via son url
                             detect_landmarks_uri(postUtilActuel.url)
-
+                        else:
+                            traceTemp.append(postUtilActuel.location.name)
 
                     # S'il n'y avait pas de localisation de base, analyse par Google Vision
                     else:
@@ -166,7 +168,7 @@ for post in posts:
             traceEnCours = False
             print("Fin de l'analyse de la trace utilisateur avec " + str(j) + " photos analysées")
 
-        print(traces)
+
         print("")
         i = i + 1
 
@@ -272,3 +274,4 @@ def creationCompteur(compteur):
 creationCompteur(compteurHSIL)
 creationCompteur(compteurHSGV)
 print(hotspots)
+print(traces)
