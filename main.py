@@ -1,3 +1,4 @@
+import json
 import os
 from datetime import datetime, timedelta
 from itertools import dropwhile, takewhile
@@ -27,16 +28,16 @@ L.login("instatrackeruppa", "instatracker")
 
 # Spécification du hastag sur lequel télécharger les photos
 #posts = L.get_hashtag_posts('larochelletourisme')
-#posts = L.get_hashtag_posts('toursaintnicolas')
-posts = L.get_hashtag_posts('larochelletourisme')
+posts = L.get_hashtag_posts('toursaintnicolas')
+#posts = L.get_hashtag_posts('larochelletourisme')
 
 # Spécification du profil sur lequel télécharger les photos
 # posts = instaloader.Profile.from_username(L.context, PROFILE).get_posts()
 
 # Pour télécharger des photos entre deux dates sur un hashtag
 # Corpus Francofolies
-FIN = datetime(2019, 12, 25)
-DEBUT = datetime(2019, 12, 22)
+FIN = datetime(2019, 7, 13)
+DEBUT = datetime(2019, 7, 10)
 
 resInstaLoader = False
 resGVision = False
@@ -59,26 +60,26 @@ def correctionTrace(traceTableau):
     tableauCorrige = []
     for i in (traceTableau):
         if "Lanterne" in i or "lanterne" in i:
-            tableauCorrige.append("Tour de la Lanterne")
+            tableauCorrige.append(["Tour de la Lanterne", 46.1557861, -1.1570111])
 
         elif "Horloge" in i or "horloge" in i:
-            tableauCorrige.append("La Grosse Horloge")
+            tableauCorrige.append(["La Grosse Horloge", 46.1583799, -1.1560111])
 
         elif "Nicolas" in i or "nicolas" in i:
-            tableauCorrige.append("Tour St-Nicolas")
+            tableauCorrige.append(["Tour St-Nicolas", 46.1557685, -1.1555935])
 
         elif "Port" in i or "port" in i or "Tour" in i or "tour" in i or "Harbour" in i or "harbour" in i \
                 or "Towers" in i or "towers" in i:
-            tableauCorrige.append("Port de La Rochelle")
+            tableauCorrige.append(["Port de La Rochelle", 46.1582234, -1.1548676])
 
         elif "Aquarium" in i or "aquarium" in i:
-            tableauCorrige.append("Aquarium de La Rochelle")
+            tableauCorrige.append(["Aquarium de La Rochelle", 46.1532698, -1.1527392])
 
         elif "Gabut" in i or "gabut" in i:
-            tableauCorrige.append("Le Gabut")
+            tableauCorrige.append(["Le Gabut", 46.1523002, -1.1555237])
 
         elif "Minimes" in i or "minimes" in i:
-            tableauCorrige.append("Les Minimes")
+            tableauCorrige.append(["Les Minimes", 46.1430282, -1.1732062])
 
         else:
             tableauCorrige.append(i)
@@ -275,3 +276,8 @@ creationCompteur(compteurHSIL)
 creationCompteur(compteurHSGV)
 print(hotspots)
 print(traces)
+with open("traces_" + str(DEBUT) + "_" + str(FIN) + ".json", "w") as write_file:
+    json.dump(traces, write_file)
+
+with open("hotspots_" + str(DEBUT) + "_" + str(FIN) + ".json", "w") as write_file:
+    json.dump(hotspots, write_file)
