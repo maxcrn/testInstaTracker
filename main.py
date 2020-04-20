@@ -39,6 +39,9 @@ posts = L.get_hashtag_posts('toursaintnicolas')
 FIN = datetime(2019, 7, 13)
 DEBUT = datetime(2019, 7, 10)
 
+debutFormat = DEBUT.strftime("%d-%m-%Y")
+finFormat = FIN.strftime("%d-%m-%Y")
+
 resInstaLoader = False
 resGVision = False
 i = 1
@@ -59,26 +62,26 @@ traceEnCours = False
 def correctionTrace(traceTableau):
     tableauCorrige = []
     for i in (traceTableau):
-        if "Lanterne" in i or "lanterne" in i:
+        if "Lanterne" in i[0] or "lanterne" in i[0]:
             tableauCorrige.append(["Tour de la Lanterne", 46.1557861, -1.1570111])
 
-        elif "Horloge" in i or "horloge" in i:
+        elif "Horloge" in i[0] or "horloge" in i[0]:
             tableauCorrige.append(["La Grosse Horloge", 46.1583799, -1.1560111])
 
-        elif "Nicolas" in i or "nicolas" in i:
+        elif "Nicolas" in i[0] or "nicolas" in i[0]:
             tableauCorrige.append(["Tour St-Nicolas", 46.1557685, -1.1555935])
 
-        elif "Port" in i or "port" in i or "Tour" in i or "tour" in i or "Harbour" in i or "harbour" in i \
-                or "Towers" in i or "towers" in i:
+        elif "Port" in i[0] or "port" in i[0] or "Tour" in i[0] or "tour" in i[0] or "Harbour" in i[0] or "harbour" in i[0] \
+                or "Towers" in i[0] or "towers" in i[0]:
             tableauCorrige.append(["Port de La Rochelle", 46.1582234, -1.1548676])
 
-        elif "Aquarium" in i or "aquarium" in i:
+        elif "Aquarium" in i[0] or "aquarium" in i[0]:
             tableauCorrige.append(["Aquarium de La Rochelle", 46.1532698, -1.1527392])
 
-        elif "Gabut" in i or "gabut" in i:
+        elif "Gabut" in i[0] or "gabut" in i[0]:
             tableauCorrige.append(["Le Gabut", 46.1523002, -1.1555237])
 
-        elif "Minimes" in i or "minimes" in i:
+        elif "Minimes" in i[0] or "minimes" in i[0]:
             tableauCorrige.append(["Les Minimes", 46.1430282, -1.1732062])
 
         else:
@@ -153,7 +156,7 @@ for post in posts:
                             # Analyse par Google Vision de la photo via son url
                             detect_landmarks_uri(postUtilActuel.url)
                         else:
-                            traceTemp.append(postUtilActuel.location.name)
+                            traceTemp.append([postUtilActuel.location.name, postUtilActuel.location.lat, postUtilActuel.location.lng])
 
                     # S'il n'y avait pas de localisation de base, analyse par Google Vision
                     else:
@@ -205,7 +208,7 @@ for post in posts:
                     else:
                         compteurHSGV[landmark.description] = 1
                 else:
-                    traceTemp.append(landmark.description)
+                    traceTemp.append([landmark.description, landmark.locations[0].lat_lng.latitude, landmark.locations[0].lat_lng.longitude])
                 return True
             else:
                 print("Localisation hors La Rochelle")
@@ -276,8 +279,8 @@ creationCompteur(compteurHSIL)
 creationCompteur(compteurHSGV)
 print(hotspots)
 print(traces)
-with open("traces_" + str(DEBUT) + "_" + str(FIN) + ".json", "w") as write_file:
+with open("traces_" + str(debutFormat) + "_" + str(finFormat) + ".json", "w") as write_file:
     json.dump(traces, write_file)
 
-with open("hotspots_" + str(DEBUT) + "_" + str(FIN) + ".json", "w") as write_file:
+with open("hotspots_" + str(debutFormat) + "_" + str(finFormat) + ".json", "w") as write_file:
     json.dump(hotspots, write_file)
