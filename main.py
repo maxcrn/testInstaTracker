@@ -17,7 +17,7 @@ lngLRMax = -1.110850
 latLRMin = 46.133955
 latLRMax = 46.190103
 
-verifTermineBool = False
+global verifTermineBool
 
 def openCollecte():
 
@@ -34,6 +34,9 @@ def openCollecte():
     choixHashtagWrite = Entry(cadreCollecteHashtag, textvariable=hashtag, width=30)
     choixHashtagWrite.pack(side="right")
 
+    hashtagAvantChamp = Label(cadreCollecteHashtag, text="#")
+    hashtagAvantChamp.pack(side="right")
+
     cadreCollecteDates = Frame(collecteWindow, width=500, height=500, borderwidth=1)
     cadreCollecteDates.pack(fill=BOTH)
 
@@ -43,11 +46,11 @@ def openCollecte():
     debut = Label(cadreCollecteDates, text="Début : ")
     debut.pack(side="left")
 
-    dateDebut = StringVar()
+
     dateDebutWrite = Entry(cadreCollecteDates, textvariable=dateDebut, width=30)
     dateDebutWrite.pack(side="left")
 
-    dateFin = StringVar()
+
     dateFinWrite = Entry(cadreCollecteDates, textvariable=dateFin, width=30)
     dateFinWrite.pack(side="right")
 
@@ -62,7 +65,9 @@ def openCollecte():
 
     def verifTermine():
         termine = Label(cadreCollecteValidation, text="Collecte terminée")
-        if verifTermineBool :
+        print(verifTermineBool)
+        if verifTermineBool:
+
             termine.pack(side="right")
 
 
@@ -93,6 +98,7 @@ def openAccueil():
 
 def collecte():
 
+    verifTermineBool = False
     hashtagCollecte = hashtag.get()
 
     L = instaloader.Instaloader()
@@ -116,8 +122,19 @@ def collecte():
 
     # Pour télécharger des photos entre deux dates sur un hashtag
     # Corpus Francofolies
-    FIN = datetime(2019, 7, 13)
-    DEBUT = datetime(2019, 7, 10)
+    dateDebutString = dateDebut.get()
+    dateFinString = dateFin.get()
+
+    debutJour = int(dateDebutString[:2])
+    debutMois = int(dateDebutString[3:5])
+    debutAnnee = int(dateDebutString[6:10])
+
+    finJour = int(dateFinString[:2])
+    finMois = int(dateFinString[3:5])
+    finAnnee = int(dateFinString[6:10])
+
+    FIN = datetime(finAnnee, finMois, finJour)
+    DEBUT = datetime(debutAnnee, debutMois, debutJour)
 
     debutFormat = DEBUT.strftime("%d-%m-%Y")
     finFormat = FIN.strftime("%d-%m-%Y")
@@ -350,17 +367,21 @@ def collecte():
     print(hotspots)
     print(traces)
 
-    with open("traces_" + str(debutFormat) + "_" + str(finFormat) + ".json", "w") as write_file:
+    with open("#" + hashtagCollecte + "_" + "traces_" + str(debutFormat) + "_" + str(finFormat) + ".json", "w") as write_file:
         json.dump(traces, write_file)
 
-    with open("hotspots_" + str(debutFormat) + "_" + str(finFormat) + ".json", "w") as write_file:
+    with open("#" + hashtagCollecte + "_" + "hotspots_" + str(debutFormat) + "_" + str(finFormat) + ".json", "w") as write_file:
         json.dump(hotspots, write_file)
 
     verifTermineBool = True
+    print(verifTermineBool)
 
 
 app = Tk()
 hashtag = StringVar()
+dateDebut = StringVar()
+dateFin = StringVar()
+verifTermineBool = None
 titre1 = tkFont.Font(family='Helvetica', size=48, weight='bold')
 titre2 = tkFont.Font(family='Helvetica', size=36, weight='bold')
 
