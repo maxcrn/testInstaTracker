@@ -50,7 +50,6 @@ def openCollecte():
     dateDebutWrite = Entry(cadreCollecteDates, textvariable=dateDebut, width=30)
     dateDebutWrite.pack(side="left")
 
-
     dateFinWrite = Entry(cadreCollecteDates, textvariable=dateFin, width=30)
     dateFinWrite.pack(side="right")
 
@@ -60,18 +59,27 @@ def openCollecte():
     cadreCollecteValidation = Frame(collecteWindow, width=500, height=500, borderwidth=1)
     cadreCollecteValidation.pack(fill=BOTH)
 
-    validation = Button(cadreCollecteValidation, text="Lancer la collecte", command=collecte)
+    validation = Button(cadreCollecteValidation, text="Lancer la collecte", command=lambda : [collecte(), supprVerifText()])
     validation.pack(side="top")
 
+    termineLabel = Label(cadreCollecteValidation, text="Collecte terminée")
+
     def verifTermine():
-        termine = Label(cadreCollecteValidation, text="Collecte terminée")
         print(verifTermineBool)
         if verifTermineBool:
+            termineLabel.pack(side="right")
+            verifTermineBouton.config(state="disabled")
 
-            termine.pack(side="right")
+
+    def supprVerifText():
+        verifTermineBouton.config(state="normal")
+        termineLabel.pack_forget()
 
 
-    verifTermineBouton = Button(cadreCollecteValidation, text="Verifier si la collecte est terminée", command=verifTermine)
+
+
+    verifTermineBouton = Button(cadreCollecteValidation, text="Verifier si la collecte est terminée",
+                                command=verifTermine, state = "disabled")
     verifTermineBouton.pack(side="left")
 
 
@@ -98,6 +106,7 @@ def openAccueil():
 
 def collecte():
 
+    global verifTermineBool
     verifTermineBool = False
     hashtagCollecte = hashtag.get()
 
