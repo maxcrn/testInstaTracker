@@ -1,17 +1,15 @@
+# coding=utf-8
 import json
 import os
 from datetime import datetime, timedelta
-from itertools import dropwhile, takewhile
 from tkinter import *
 import tkinter.font as tkFont
-
-import instaloader
+from instaloader import *
 
 # Credentials pour le login sur Google Vision
-os.environ[
-    "GOOGLE_APPLICATION_CREDENTIALS"] = "/Users/maxcarin/Documents/Cours/M1 S2/Gestion de Projet/InstaTracker-d209c2a2aab7.json"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/Users/maxcarin/Documents/Cours/M1 S2/Gestion de Projet/InstaTracker-d209c2a2aab7.json"
 
-# Données en longitude et latitude de La Rochelle
+# Donnees en longitude et latitude de La Rochelle
 lngLRMin = -1.234431
 lngLRMax = -1.110850
 latLRMin = 46.133955
@@ -105,6 +103,7 @@ def openAccueil():
 
 
 def collecte():
+
 
     global verifTermineBool
     verifTermineBool = False
@@ -266,8 +265,11 @@ def collecte():
                             detect_landmarks_uri(postUtilActuel.url)
 
                         j = j + 1
-                traceTempClean = correctionTrace(traceTemp)
-                traces[post.owner_username] = traceTempClean
+
+                if len(traceTemp) > 3:
+                    traceTempClean = correctionTrace(traceTemp)
+                    traces[post.owner_username] = traceTempClean
+
                 # On remet les varaibles de test à False
                 resInstaLoader = False
                 resGVision = False
