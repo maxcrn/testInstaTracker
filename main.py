@@ -4,7 +4,10 @@ import os
 from datetime import datetime, timedelta
 from tkinter import *
 import tkinter.font as tkFont
+from tkinter import filedialog
 from instaloader import *
+import os
+import webbrowser
 
 # Credentials pour le login sur Google Vision
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/Users/maxcarin/Documents/Cours/M1 S2/Gestion de Projet/InstaTracker-d209c2a2aab7.json"
@@ -85,8 +88,51 @@ def openCollecte():
 
 def openVisu():
     collecteWindow = Toplevel()
-    labelCollecte = Label(collecteWindow, text="Visualisation des données")
-    labelCollecte.pack()
+
+    cadreVisualisation = Frame(collecteWindow, width=500, height=500, borderwidth=1)
+    cadreVisualisation.pack(fill=BOTH)
+
+    labelVisu = Label(cadreVisualisation, text="Visualisation des données")
+    labelVisu.pack()
+
+    def openExplorateurCarte():
+        filename = filedialog.askopenfilename(initialdir=os.getcwd(), title="Select file",
+                                              filetypes=(("all files", ".html"), ("all files", ".*")))
+        filenamePhoto = 'file:///' + filename
+        webbrowser.open_new_tab(filenamePhoto)
+
+    buttonVisuCarte = Button(cadreVisualisation, text="Selectionner une carte à afficher", command=openExplorateurCarte)
+    buttonVisuCarte.pack()
+
+    global cadreJson
+    cadreJson = Frame(collecteWindow, width=200, height=200, borderwidth=1)
+
+    def openExplorateurJson():
+        global cadreJson
+        cadreJson.pack_forget()
+        cadreJson = Frame(collecteWindow, width=200, height=200, borderwidth=1)
+        cadreJson.pack(fill=BOTH)
+
+        filename = filedialog.askopenfilename(initialdir=os.getcwd(), title="Select file",
+                                              filetypes=(("all files", ".json"), ("all files", ".*")))
+
+        Label(cadreJson, text="Hotspots").grid(column=1, row=1)
+        Label(cadreJson, text="Nombre d'apparitions").grid(column=2, row=1)
+
+        with open(filename) as json_file:
+            data = json.load(json_file)
+        print(data)
+
+        k = 2
+
+        for i in data:
+            Label(cadreJson, text=i).grid(column=1, row=k)
+            Label(cadreJson, text=data[i]).grid(column=2, row=k)
+            k = k + 1
+
+    buttonVisuJson = Button(cadreVisualisation, text="Selectionner un fichier de hostpots à afficher", command=openExplorateurJson)
+    buttonVisuJson.pack()
+
 
 def openAccueil():
     cadre = Frame(app, width=500, height=500, borderwidth=1)
@@ -378,10 +424,21 @@ def collecte():
     print(hotspots)
     print(traces)
 
-    with open("#" + hashtagCollecte + "_" + "traces_" + str(debutFormat) + "_" + str(finFormat) + ".json", "w") as write_file:
+    cheminDossier = "/Collectes/#" + hashtagCollecte + str(debutFormat) + "_" + str(finFormat) + "/"
+
+    if not os.path.exists(cheminDossier):
+        os.makedirs(cheminDossier)
+
+    if not os.path.exists(cheminDossier + "Hotspots/"):
+        os.makedirs(cheminDossier + "Hotspots/")
+
+    if not os.path.exists(cheminDossier + "Traces/"):
+        os.makedirs(cheminDossier + "Traces/")
+
+    with open(cheminDossier + "Traces/" + "#" + hashtagCollecte + "_" + "traces_" + str(debutFormat) + "_" + str(finFormat) + ".json", "w") as write_file:
         json.dump(traces, write_file)
 
-    with open("#" + hashtagCollecte + "_" + "hotspots_" + str(debutFormat) + "_" + str(finFormat) + ".json", "w") as write_file:
+    with open(cheminDossier + "Hotspots/" + "#" + hashtagCollecte + "_" + "hotspots_" + str(debutFormat) + "_" + str(finFormat) + ".json", "w") as write_file:
         json.dump(hotspots, write_file)
 
     verifTermineBool = True
