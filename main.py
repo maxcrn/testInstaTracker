@@ -96,12 +96,12 @@ def openVisu():
     labelVisu.pack()
 
     def openExplorateurCarte():
-        filename = filedialog.askopenfilename(initialdir=os.getcwd(), title="Select file",
+        filename = filedialog.askopenfilename(initialdir=(os.getcwd()+ "/Collectes"), title="Select file",
                                               filetypes=(("all files", ".html"), ("all files", ".*")))
         filenamePhoto = 'file:///' + filename
         webbrowser.open_new_tab(filenamePhoto)
 
-    buttonVisuCarte = Button(cadreVisualisation, text="Selectionner une carte à afficher", command=openExplorateurCarte)
+    buttonVisuCarte = Button(cadreVisualisation, text="Selectionner une carte à afficher dans Traces", command=openExplorateurCarte)
     buttonVisuCarte.pack()
 
     global cadreJson
@@ -113,7 +113,7 @@ def openVisu():
         cadreJson = Frame(collecteWindow, width=200, height=200, borderwidth=1)
         cadreJson.pack(fill=BOTH)
 
-        filename = filedialog.askopenfilename(initialdir=os.getcwd(), title="Select file",
+        filename = filedialog.askopenfilename(initialdir=(os.getcwd()+ "/Collectes"), title="Select file",
                                               filetypes=(("all files", ".json"), ("all files", ".*")))
 
         Label(cadreJson, text="Hotspots").grid(column=1, row=1)
@@ -424,16 +424,16 @@ def collecte():
     print(hotspots)
     print(traces)
 
-    cheminDossier = "/Collectes/#" + hashtagCollecte + str(debutFormat) + "_" + str(finFormat) + "/"
+    cheminDossier = "Collectes/#" + hashtagCollecte + str(debutFormat) + "_" + str(finFormat) + "/"
 
     if not os.path.exists(cheminDossier):
-        os.makedirs(cheminDossier)
+        os.makedirs(cheminDossier, 0o777)
 
     if not os.path.exists(cheminDossier + "Hotspots/"):
-        os.makedirs(cheminDossier + "Hotspots/")
+        os.makedirs(cheminDossier + "Hotspots/", 0o777)
 
     if not os.path.exists(cheminDossier + "Traces/"):
-        os.makedirs(cheminDossier + "Traces/")
+        os.makedirs(cheminDossier + "Traces/", 0o777)
 
     with open(cheminDossier + "Traces/" + "#" + hashtagCollecte + "_" + "traces_" + str(debutFormat) + "_" + str(finFormat) + ".json", "w") as write_file:
         json.dump(traces, write_file)
