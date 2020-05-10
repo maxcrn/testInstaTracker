@@ -329,7 +329,7 @@ def collecte():
                 resInstaLoader = False
                 resGVision = False
                 traceEnCours = False
-                print("Fin de l'analyse de la trace utilisateur avec " + str(j) + " photos analysées")
+                print("Fin de l'analyse de la trace utilisateur avec " + str(j-1) + " photos analysées")
 
             print("")
             i = i + 1
@@ -449,6 +449,9 @@ def collecte():
 
     with open(cheminDossier + "Hotspots/" + "#" + hashtagCollecte + "_" + "hotspots_" + str(debutFormat) + "_" + str(finFormat) + ".json", "w") as write_file:
         json.dump(hotspots, write_file)
+
+    with open(cheminDossier + "Hotspots/" + "#" + hashtagCollecte + "_" + "nombrePhotosHotspots" + str(debutFormat) + "_" + str(finFormat) + ".json", "w") as write_file:
+        json.dump(i-1, write_file)
 
     c = folium.Map(location=[46.158152, -1.151455], zoom_start=14) # Création de la carte
 
