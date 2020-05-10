@@ -8,6 +8,7 @@ from tkinter import filedialog
 from instaloader import *
 import os
 import webbrowser
+import folium
 
 # Credentials pour le login sur Google Vision
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/Users/maxcarin/Documents/Cours/M1 S2/Gestion de Projet/InstaTracker-d209c2a2aab7.json"
@@ -151,7 +152,15 @@ def openAccueil():
 def collecte():
 
 
-    global verifTermineBool
+    global verifTermineBool # Utilisation de la variable globale trace
+
+    # Tableau de couleurs pour le tracé de la carte
+    color = ['black', 'red', 'blue', 'green', 'gold', 'darkorchild', 'deepskyblue',
+             'sandybrown', 'olivedrab', 'palevioletred', 'seagreen', 'sienna', 'cyan',
+             'indigo', 'magenta', 'orange', 'indianred', 'lightstillblue', 'thistle', 'yellow']
+
+
+
     verifTermineBool = False
     hashtagCollecte = hashtag.get()
 
@@ -440,6 +449,34 @@ def collecte():
 
     with open(cheminDossier + "Hotspots/" + "#" + hashtagCollecte + "_" + "hotspots_" + str(debutFormat) + "_" + str(finFormat) + ".json", "w") as write_file:
         json.dump(hotspots, write_file)
+
+    c = folium.Map(location=[46.158152, -1.151455], zoom_start=14) # Création de la carte
+
+    colorNb = 0 # Compteur de couleurs à 0
+
+    # Création des traces sur la carte
+    for i in traces:
+        # On remet la 1ere couleur s'il y a eu plus de 20 traces
+        if colorNb > 19 :
+            colorNb = 0
+
+        intermediaire = []
+        k = 0
+
+        # Création des points
+        for j in traces[i]:
+            intermediaire.append([j[1], j[2]])
+            print(intermediaire)
+            folium.Circle(radius=10, location=intermediaire[k], color="red", popup=j[0]).add_to(c)
+            k = k + 1
+
+        # Création des lignes
+        folium.PolyLine(intermediaire, popup=i, color=color[colorNb]).add_to(c)
+        colorNb = colorNb + 1
+
+    # Sauvegarde de la carte
+    c.save(cheminDossier + "Traces/" + "#" + hashtagCollecte + "_" + "hotspots_" + str(debutFormat) + "_" + str(finFormat) + '.html')
+
 
     verifTermineBool = True
     print(verifTermineBool)
