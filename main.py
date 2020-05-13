@@ -222,7 +222,7 @@ def collecte():
     def correctionTrace(traceTableau):
         tableauCorrige = []
         for i in (traceTableau):
-            if "Lanterne" in i[0] or "lanterne" in i[0]:
+            if "Lanterne" in i[0] or "lanterne" in i[0] or "lantern" in i[0] or "Lantern" in i[0]:
                 tableauCorrige.append(["Tour de la Lanterne", 46.1557861, -1.1570111])
 
             elif "Horloge" in i[0] or "horloge" in i[0]:
@@ -258,18 +258,24 @@ def collecte():
             print("Photo " + str(i) + " ayant la date " + str(post.date))
 
             # Condition sur la localisation du post
-            if post.location != None and lngLRMin < post.location.lng < lngLRMax and latLRMin < post.location.lat < latLRMax:
-                print("Analyse InstaLoader : " + post.location.name)
+            try:
+                if post.location != None and lngLRMin < post.location.lng < lngLRMax and latLRMin < post.location.lat < latLRMax:
+                    print("Analyse InstaLoader : " + post.location.name)
 
-                # Condition sur le nom de la localisation (si pas assez précis, envoi à Google Vision)
-                if post.location.name == "La Rochelle, France":
-                    resGVision = detect_landmarks_uri(post.url)  # Analyse par Google Vision de la photo via son url
+                    # Condition sur le nom de la localisation (si pas assez précis, envoi à Google Vision)
+                    if post.location.name == "La Rochelle, France":
+                        resGVision = detect_landmarks_uri(post.url)  # Analyse par Google Vision de la photo via son url
+                    else:
+                        resInstaLoader = True
+
                 else:
-                    resInstaLoader = True
+                    print("Pas de localisation InstaLoader")
+                    resGVision = detect_landmarks_uri(post.url)  # Analyse par Google Vision via son url
 
-            else:
-                print("Pas de localisation InstaLoader")
-                resGVision = detect_landmarks_uri(post.url)  # Analyse par Google Vision via son url
+            except:
+                print("Il y a eu une erreur")
+            finally:
+                pass
 
             # S'il y a une localisation précise sur la photo, on selectionne l'utilisateur et on analyse ses posts sur 2 jours
             if resGVision or resInstaLoader:
@@ -301,27 +307,34 @@ def collecte():
                         print("Photo " + str(j) + " de l'analyse de la trace ayant la date " + str(postUtilActuel.date))
 
                         # Condition sur la localisation du post
-                        if postUtilActuel.location != None \
-                                and lngLRMin < postUtilActuel.location.lng < lngLRMax \
-                                and latLRMin < postUtilActuel.location.lat < latLRMax:
-                            print("Analyse InstaLoader : " + postUtilActuel.location.name)
+                        try:
+                            if postUtilActuel.location != None \
+                                    and lngLRMin < postUtilActuel.location.lng < lngLRMax \
+                                    and latLRMin < postUtilActuel.location.lat < latLRMax:
+                                print("Analyse InstaLoader : " + postUtilActuel.location.name)
 
-                            # Condition sur le nom de la localisation (si pas assez précis, envoi à Google Vision)
-                            if postUtilActuel.location.name == "La Rochelle, France":
-                                # Analyse par Google Vision de la photo via son url
-                                detect_landmarks_uri(postUtilActuel.url)
+                                # Condition sur le nom de la localisation (si pas assez précis, envoi à Google Vision)
+                                if postUtilActuel.location.name == "La Rochelle, France":
+                                    # Analyse par Google Vision de la photo via son url
+                                    detect_landmarks_uri(postUtilActuel.url)
+                                else:
+                                    traceTemp.append([postUtilActuel.location.name, postUtilActuel.location.lat,
+                                                      postUtilActuel.location.lng])
+
+                            # S'il n'y avait pas de localisation de base, analyse par Google Vision
                             else:
-                                traceTemp.append([postUtilActuel.location.name, postUtilActuel.location.lat,
-                                                  postUtilActuel.location.lng])
+                                print("Pas de localisation InstaLoader")
+                                detect_landmarks_uri(postUtilActuel.url)
 
-                        # S'il n'y avait pas de localisation de base, analyse par Google Vision
-                        else:
-                            print("Pas de localisation InstaLoader")
-                            detect_landmarks_uri(postUtilActuel.url)
+                            j = j + 1
+                        except:
+                            print("Il y a eu une erreur")
+                            j = j + 1
+                        finally:
+                            pass
 
-                        j = j + 1
 
-                if len(traceTemp) > 3:
+                if len(traceTemp) > 1:
                     traceTempClean = correctionTrace(traceTemp)
                     traces[post.owner_username] = traceTempClean
 
@@ -380,7 +393,7 @@ def collecte():
     def creationCompteur(compteur):
         # key : values
         for i in (compteur):
-            if "Lanterne" in i or "lanterne" in i:
+            if "Lanterne" in i or "lanterne" in i or "lantern" in i or "Lantern" in i:
                 if "Tour de la Lanterne" in hotspots:
                     hotspots["Tour de la Lanterne"] += compteur[i]
                 else:
@@ -460,7 +473,7 @@ def collecte():
     # Création des traces sur la carte
     for i in traces:
         # On remet la 1ere couleur s'il y a eu plus de 20 traces
-        if colorNb > 19 :
+        if colorNb > 19:
             colorNb = 0
 
         intermediaire = []
