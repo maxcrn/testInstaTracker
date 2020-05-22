@@ -491,7 +491,7 @@ def collecte():
         colorNb = colorNb + 1
 
     # Sauvegarde de la carte
-    c.save(cheminDossier + "Traces/" + "#" + hashtagCollecte + "_" + "hotspots_" + str(debutFormat) + "_" + str(finFormat) + '.html')
+    c.save(cheminDossier + "Traces/" + "#" + hashtagCollecte + "_traces_" + str(debutFormat) + "_" + str(finFormat) + '.html')
 
 
     verifTermineBool = True
